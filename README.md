@@ -7,7 +7,7 @@ The right-hand sidebar can be collapsed to give the table more width, and the lo
 
 ## Open the app
 
-Open [`index.html`](/Users/anthonybrano/Dropbox/AJB/periodic-table-explorer/index.html) in a browser. The app loads a bundled local JavaScript data file, so it does not need a local dev server just to browse.
+Open [`index.html`](./index.html) in a browser. The app loads a bundled local JavaScript data file, so it does not need a local dev server just to browse.
 
 ## Why a table instead of a map
 
@@ -27,7 +27,7 @@ curl -Lsf https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/mas
 
 The generator writes:
 
-- [`data/periodic-table-data.js`](/Users/anthonybrano/Dropbox/AJB/periodic-table-explorer/data/periodic-table-data.js)
+- [`data/periodic-table-data.js`](./data/periodic-table-data.js)
 
 ## Data source and attribution
 
