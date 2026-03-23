@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Periodic Table Explorer</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./data/periodic-table-data.js"></script>
+    <script defer src="./app.js"></script>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Matter Explorer</p>
+          <h1>Periodic Table Explorer</h1>
+          <p class="hero-summary">
+            A click-to-learn periodic table built for browsing. Search by name,
+            symbol, number, family, phase, block, or period, then open a lesson
+            card for electron shells, discovery notes, and chemistry facts.
+          </p>
+        </div>
+        <div class="hero-stats" id="hero-stats"></div>
+      </header>
+
+      <section class="controls-panel">
+        <label class="field field-search">
+          <span>Search elements</span>
+          <input
+            id="search-input"
+            type="search"
+            placeholder="Try gold, Au, carbon, or 79"
+          />
+        </label>
+
+        <label class="field">
+          <span>Family</span>
+          <select id="category-filter"></select>
+        </label>
+
+        <label class="field">
+          <span>Phase</span>
+          <select id="phase-filter"></select>
+        </label>
+
+        <label class="field">
+          <span>Block</span>
+          <select id="block-filter"></select>
+        </label>
+
+        <label class="field">
+          <span>Period</span>
+          <select id="period-filter"></select>
+        </label>
+      </section>
+
+      <main class="app-grid" id="app-grid">
+        <section class="table-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-label">Interactive Table</p>
+              <h2 id="table-heading">Loading elements</h2>
+            </div>
+            <div class="panel-actions">
+              <button id="toggle-guide-button" class="ghost-button" type="button">
+                Hide sidebar
+              </button>
+              <button id="reset-filters-button" class="ghost-button" type="button">
+                Reset filters
+              </button>
+            </div>
+          </div>
+          <p class="panel-caption" id="table-caption"></p>
+
+          <div class="table-scroll">
+            <div
+              class="periodic-grid"
+              id="periodic-grid"
+              aria-label="Interactive periodic table"
+            ></div>
+          </div>
+        </section>
+
+        <aside class="guide-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-label">Element Spotlight</p>
+              <h2 id="spotlight-heading">Choose an element</h2>
+            </div>
+          </div>
+
+          <div class="spotlight-card" id="spotlight-card"></div>
+
+          <section class="guide-block reaction-block">
+            <h3>Reaction Lab</h3>
+            <p class="reaction-copy">
+              Pick two elements to see a bundled reaction example when a classic
+              direct reaction is included. This is a curated teaching tool, not
+              a full chemistry engine.
+            </p>
+            <div class="reaction-controls">
+              <label class="field">
+                <span>Element A</span>
+                <select id="reaction-left-select"></select>
+              </label>
+              <label class="field">
+                <span>Element B</span>
+                <select id="reaction-right-select"></select>
+              </label>
+            </div>
+            <div class="reaction-card" id="reaction-card"></div>
+          </section>
+
+          <section class="guide-block">
+            <h3>Families</h3>
+            <div class="category-legend" id="category-legend"></div>
+          </section>
+
+          <section class="guide-block" id="history-card"></section>
+        </aside>
+
+        <section class="patterns-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-label">Pattern Deck</p>
+              <h2 id="patterns-heading">Periodic relationships</h2>
+            </div>
+          </div>
+          <p class="panel-caption" id="patterns-caption"></p>
+          <div class="pattern-grid">
+            <article class="pattern-card" id="selected-context-card"></article>
+            <article class="pattern-card" id="group-context-card"></article>
+            <article class="pattern-card" id="period-context-card"></article>
+            <article class="pattern-card" id="reaction-shortcuts-card"></article>
+          </div>
+        </section>
+      </main>
+
+      <footer class="sources-panel" id="sources-panel"></footer>
+    </div>
+
+    <div class="modal" id="element-modal" hidden>
+      <div class="modal-backdrop" data-close-modal="true"></div>
+      <section
+        class="modal-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+      >
+        <div class="modal-header">
+          <div>
+            <p class="panel-label">Lesson Card</p>
+            <h2 id="modal-title">Element details</h2>
+          </div>
+          <button id="close-modal-button" class="ghost-button close-button" type="button">
+            Close
+          </button>
+        </div>
+        <div class="modal-content" id="modal-content"></div>
+      </section>
+    </div>
+  </body>
+</html>
