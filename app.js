@@ -1,5 +1,6 @@
 const data = window.PERIODIC_TABLE_EXPLORER_DATA;
 const GUIDE_COLLAPSE_STORAGE_KEY = "periodic-table-explorer:guide-collapsed";
+const THEME_STORAGE_KEY = "periodic-table-explorer:theme";
 
 const CATEGORY_META = {
   actinide: {
@@ -222,6 +223,68 @@ const REACTION_LIBRARY = {
   },
 };
 
+const GEO_LENS_RESERVOIR_SYMBOLS = new Set(["H", "He", "C", "N", "O", "Ne", "Ar", "Kr", "Xe", "Rn", "Cl"]);
+const GEO_LENS_WIDESPREAD_SYMBOLS = new Set(["Na", "Mg", "Al", "Si", "P", "S", "K", "Ca", "Fe"]);
+const GEO_LENS_RESOURCE_SYMBOLS = new Set([
+  "Li",
+  "Be",
+  "B",
+  "Sc",
+  "Ti",
+  "V",
+  "Cr",
+  "Mn",
+  "Co",
+  "Ni",
+  "Cu",
+  "Zn",
+  "Ga",
+  "Ge",
+  "Se",
+  "Rb",
+  "Sr",
+  "Y",
+  "Zr",
+  "Nb",
+  "Mo",
+  "Ag",
+  "Cd",
+  "In",
+  "Sn",
+  "Sb",
+  "Te",
+  "Cs",
+  "Ba",
+  "La",
+  "Ce",
+  "Pr",
+  "Nd",
+  "Sm",
+  "Eu",
+  "Gd",
+  "Tb",
+  "Dy",
+  "Ho",
+  "Er",
+  "Tm",
+  "Yb",
+  "Lu",
+  "Hf",
+  "Ta",
+  "W",
+  "Re",
+  "Os",
+  "Ir",
+  "Pt",
+  "Au",
+  "Hg",
+  "Tl",
+  "Pb",
+  "Bi",
+  "Th",
+  "U",
+]);
+
 const elementsData = data.elements.map((element) => {
   const categoryKey = slugify(element.normalized_category || element.category || "unknown");
   const phaseKey = slugify(element.phase || "Unknown");
@@ -242,9 +305,12 @@ const state = {
   selectedNumber: 6,
   reactionLeft: 1,
   reactionRight: 8,
+  theme: loadStoredTheme(),
   guideCollapsed: loadStoredGuideState(),
   modalOpen: false,
 };
+
+document.documentElement.dataset.theme = state.theme;
 
 const elements = {
   appGrid: document.querySelector("#app-grid"),
@@ -254,6 +320,7 @@ const elements = {
   phaseFilter: document.querySelector("#phase-filter"),
   blockFilter: document.querySelector("#block-filter"),
   periodFilter: document.querySelector("#period-filter"),
+  themeToggleButton: document.querySelector("#theme-toggle-button"),
   resetFiltersButton: document.querySelector("#reset-filters-button"),
   toggleGuideButton: document.querySelector("#toggle-guide-button"),
   tableHeading: document.querySelector("#table-heading"),
@@ -273,11 +340,37 @@ const elements = {
   groupContextCard: document.querySelector("#group-context-card"),
   periodContextCard: document.querySelector("#period-context-card"),
   reactionShortcutsCard: document.querySelector("#reaction-shortcuts-card"),
+  geoContextCard: document.querySelector("#geo-context-card"),
   modal: document.querySelector("#element-modal"),
   modalTitle: document.querySelector("#modal-title"),
   modalContent: document.querySelector("#modal-content"),
   closeModalButton: document.querySelector("#close-modal-button"),
 };
+
+function loadStoredTheme() {
+  try {
+    const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+    if (storedTheme === "light" || storedTheme === "dark") {
+      return storedTheme;
+    }
+  } catch (error) {
+    return "light";
+  }
+
+  if (typeof window.matchMedia === "function") {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+
+  return "light";
+}
+
+function persistTheme() {
+  try {
+    window.localStorage.setItem(THEME_STORAGE_KEY, state.theme);
+  } catch (error) {
+    // Ignore storage failures and keep the in-memory state.
+  }
+}
 
 function loadStoredGuideState() {
   try {
@@ -436,6 +529,14 @@ function renderGuideVisibility() {
   elements.toggleGuideButton.setAttribute("aria-expanded", String(!state.guideCollapsed));
 }
 
+function applyTheme() {
+  const nextModeLabel = state.theme === "dark" ? "Light mode" : "Dark mode";
+  document.documentElement.dataset.theme = state.theme;
+  elements.themeToggleButton.textContent = nextModeLabel;
+  elements.themeToggleButton.setAttribute("aria-pressed", String(state.theme === "dark"));
+  elements.themeToggleButton.setAttribute("aria-label", `Switch to ${nextModeLabel.toLowerCase()}`);
+}
+
 function getReactionKey(leftNumber, rightNumber) {
   return [leftNumber, rightNumber].sort((left, right) => left - right).join("-");
 }
@@ -513,7 +614,7 @@ function renderPatternDeck() {
 
   elements.patternsHeading.textContent = `${element.name} in context`;
   elements.patternsCaption.textContent =
-    "Use the lower deck to compare the selected element with its column, row, and bundled reaction pathways.";
+    "Use the lower deck to compare the selected element with its column, row, bundled reactions, and whether geography adds real context.";
 
   elements.selectedContextCard.innerHTML = `
     <h3>Selected Element</h3>
@@ -626,6 +727,8 @@ function renderPatternDeck() {
         `
     }
   `;
+
+  renderGeoContextCard(element);
 
   document.querySelectorAll("[data-jump-element-number]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -769,6 +872,123 @@ function renderHistoryCard() {
           : ""
       }
       <span class="spotlight-chip">${escapeHtml(`Era: ${eraLabel}`)}</span>
+    </div>
+  `;
+}
+
+// Geography is educational here: it signals when a map adds context instead of inventing fake locations.
+function buildGeoLens(element) {
+  if (element.number >= 93) {
+    return {
+      emphasis: "focus",
+      badge: "Labs",
+      verdict: "Discovery and lab maps matter most",
+      summary: `${element.name} is synthetic, so it is created in reactors or particle-accelerator settings rather than mined as a naturally abundant element.`,
+      detail:
+        "A useful map would show the laboratories, discovery sites, and research centers tied to its creation instead of pretending it has a natural world distribution.",
+      chips: ["Best map: discovery labs", "Natural-location map: low value", "Use case: research history"],
+    };
+  }
+
+  if (GEO_LENS_RESERVOIR_SYMBOLS.has(element.symbol)) {
+    return {
+      emphasis: "low",
+      badge: "Cycle",
+      verdict: "Reservoir maps beat country maps",
+      summary: `${element.name} is spread through large planetary reservoirs such as the atmosphere, oceans, or living systems, so a country-by-country location map would teach very little.`,
+      detail:
+        "If we map it at all, the better story is where it cycles, accumulates, or gets industrially separated rather than where it simply exists.",
+      chips: ["Best map: atmosphere or oceans", "Natural-location map: low value", "Use case: Earth systems"],
+    };
+  }
+
+  if (GEO_LENS_WIDESPREAD_SYMBOLS.has(element.symbol)) {
+    return {
+      emphasis: "low",
+      badge: "Crust",
+      verdict: "Too widespread for a literal world map",
+      summary: `${element.name} is common enough in crustal rocks, seawater, or ordinary minerals that a generic 'where is it found?' map mostly turns into 'almost everywhere.'`,
+      detail:
+        "Geography becomes more useful when it focuses on rich ores, major producers, or where industry concentrates extraction and refining.",
+      chips: ["Best map: ore bodies and producers", "Natural-location map: low to medium", "Use case: geology"],
+    };
+  }
+
+  if (
+    GEO_LENS_RESOURCE_SYMBOLS.has(element.symbol) ||
+    element.categoryKey === "lanthanide" ||
+    element.categoryKey === "actinide"
+  ) {
+    return {
+      emphasis: "high",
+      badge: "Hotspots",
+      verdict: "A resource map can genuinely help",
+      summary: `${element.name} is often understood through concentrated ores, mining districts, refining capacity, and strategic supply chains, so geography can add real context here.`,
+      detail:
+        "The meaningful map is not 'where the element exists' in nature, but where economically important deposits are extracted, processed, and recycled.",
+      chips: ["Best map: mining and refining", "Natural-location map: medium to high", "Use case: resources"],
+    };
+  }
+
+  return {
+    emphasis: "medium",
+    badge: "Context",
+    verdict: "Context maps are better than location maps",
+    summary: `${element.name} does not belong to one clean part of the world. Like most elements, it appears inside compounds and minerals scattered across many environments.`,
+    detail:
+      "If we add a future map layer, it should probably track discovery history, major production zones, or important uses rather than imply the element lives in one place.",
+    chips: ["Best map: production and discovery", "Natural-location map: medium", "Use case: context"],
+  };
+}
+
+function renderGeoMapVisual(lens) {
+  return `
+    <svg class="geo-map" viewBox="0 0 640 320" aria-hidden="true">
+      <rect class="geo-ocean" x="8" y="8" width="624" height="304" rx="28"></rect>
+      <g class="geo-graticule">
+        <path d="M72 88H568"></path>
+        <path d="M52 160H588"></path>
+        <path d="M80 232H560"></path>
+        <path d="M160 36V284"></path>
+        <path d="M320 24V296"></path>
+        <path d="M480 36V284"></path>
+      </g>
+      <g class="geo-land">
+        <path d="M106 92l42-20 36 6 28 24-8 18 18 18-10 24-32 10-22 20-28-6-10-20-26-12-14-28 10-18 16-16z"></path>
+        <path d="M214 184l18 10 12 30-8 30-16 22-14-12 4-30-8-20 12-30z"></path>
+        <path d="M312 84l42-18 74 8 40 20 36 0 38 22-8 18-32 6-22 26-24 10-16 28-30 10-26-12-20 12-18-10-6-28-24-20-26-4-12-24 12-24 22-18z"></path>
+        <path d="M382 170l22 8 10 26-8 38-18 26-26-16-6-28 10-34 16-20z"></path>
+        <path d="M524 228l26-8 24 8 10 22-18 18-28 0-20-16 6-24z"></path>
+        <path d="M498 136l14-12 18 4 6 12-16 10-18-4-4-10z"></path>
+      </g>
+      <g class="geo-badge geo-badge-${escapeHtml(lens.emphasis)}">
+        <rect x="438" y="28" width="150" height="46" rx="23"></rect>
+        <text x="513" y="58" text-anchor="middle">${escapeHtml(lens.badge)}</text>
+      </g>
+    </svg>
+  `;
+}
+
+function renderGeoContextCard(selectedElement = getElementByNumber(state.selectedNumber) || elementsData[0]) {
+  const lens = buildGeoLens(selectedElement);
+
+  elements.geoContextCard.innerHTML = `
+    <h3>Geography Lens</h3>
+    <div class="geo-context-layout">
+      <div class="geo-map-shell is-${escapeHtml(lens.emphasis)}">
+        ${renderGeoMapVisual(lens)}
+        <p class="geo-map-caption">${escapeHtml(lens.verdict)}</p>
+      </div>
+      <div class="geo-copy">
+        <h4>${escapeHtml(`${selectedElement.name} and world maps`)}</h4>
+        <p>${escapeHtml(lens.summary)}</p>
+        <p>${escapeHtml(lens.detail)}</p>
+        <div class="spotlight-chip-row">
+          ${lens.chips
+            .map((chip) => `<span class="spotlight-chip">${escapeHtml(chip)}</span>`)
+            .join("")}
+        </div>
+      </div>
     </div>
   `;
 }
@@ -973,6 +1193,7 @@ function closeModal() {
 
 function render() {
   const visibleElements = getVisibleElements();
+  applyTheme();
   renderGuideVisibility();
   buildHeroStats(visibleElements);
   renderPeriodicTable(visibleElements);
@@ -1009,6 +1230,12 @@ function bindEvents() {
 
   elements.periodFilter.addEventListener("change", (event) => {
     state.period = event.target.value;
+    render();
+  });
+
+  elements.themeToggleButton.addEventListener("click", () => {
+    state.theme = state.theme === "dark" ? "light" : "dark";
+    persistTheme();
     render();
   });
 

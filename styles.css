@@ -25,12 +25,34 @@
 
 html {
   min-height: 100%;
+  color-scheme: light;
   background:
     radial-gradient(circle at top left, rgba(255, 122, 60, 0.16), transparent 26%),
     radial-gradient(circle at top right, rgba(15, 109, 255, 0.14), transparent 24%),
     linear-gradient(155deg, #edf4f6 0%, #ddeaf4 46%, #eaf1f8 100%);
   color: var(--text);
   font-family: var(--body-font);
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #07121d;
+  --bg-deep: #0e2033;
+  --panel: rgba(7, 18, 29, 0.82);
+  --panel-strong: rgba(11, 24, 38, 0.94);
+  --line: rgba(166, 198, 230, 0.16);
+  --line-strong: rgba(109, 177, 255, 0.26);
+  --text: #eef6ff;
+  --text-muted: #a9bed3;
+  --accent: #6db1ff;
+  --accent-strong: #d3e7ff;
+  --accent-warm: #ff9b5e;
+  --accent-soft: rgba(109, 177, 255, 0.18);
+  --shadow: 0 32px 72px rgba(0, 0, 0, 0.42);
+  background:
+    radial-gradient(circle at top left, rgba(255, 155, 94, 0.16), transparent 24%),
+    radial-gradient(circle at top right, rgba(109, 177, 255, 0.18), transparent 26%),
+    linear-gradient(160deg, #06111b 0%, #0a1623 48%, #102233 100%);
 }
 
 body {
@@ -67,6 +89,7 @@ select {
 .controls-panel,
 .table-panel,
 .guide-panel,
+.patterns-panel,
 .sources-panel,
 .modal-panel {
   background: var(--panel);
@@ -665,6 +688,101 @@ select {
   justify-content: flex-start;
 }
 
+.pattern-card-wide {
+  grid-column: 1 / -1;
+}
+
+.geo-context-layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+}
+
+.geo-map-shell {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 22px;
+  border: 1px solid rgba(17, 45, 72, 0.12);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(244, 249, 255, 0.86)),
+    radial-gradient(circle at top right, rgba(15, 109, 255, 0.08), transparent 48%);
+}
+
+.geo-map-shell.is-high {
+  border-color: rgba(255, 122, 60, 0.22);
+}
+
+.geo-map-shell.is-focus {
+  border-color: rgba(244, 105, 169, 0.24);
+}
+
+.geo-map-shell.is-medium {
+  border-color: rgba(15, 109, 255, 0.18);
+}
+
+.geo-map {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.geo-ocean {
+  fill: rgba(235, 245, 255, 0.95);
+  stroke: rgba(17, 45, 72, 0.08);
+  stroke-width: 1;
+}
+
+.geo-graticule path {
+  fill: none;
+  stroke: rgba(17, 45, 72, 0.08);
+  stroke-width: 1.5;
+}
+
+.geo-land path {
+  fill: rgba(15, 109, 255, 0.24);
+}
+
+.geo-badge rect {
+  fill: rgba(255, 255, 255, 0.88);
+  stroke: rgba(17, 45, 72, 0.12);
+  stroke-width: 1;
+}
+
+.geo-badge text {
+  fill: var(--accent-strong);
+  font-family: var(--display-font);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.geo-map-caption {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.geo-copy {
+  display: grid;
+  gap: 10px;
+}
+
+.geo-copy h4 {
+  margin: 0;
+  font-family: var(--display-font);
+  font-size: 1.08rem;
+  line-height: 1;
+}
+
+.geo-copy p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.62;
+}
+
 .sources-panel {
   margin-top: 22px;
   padding: 18px 20px;
@@ -835,6 +953,145 @@ body.modal-open {
   overflow: hidden;
 }
 
+html[data-theme="dark"] .page-shell {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(109, 177, 255, 0.035),
+      rgba(109, 177, 255, 0.035) 1px,
+      transparent 1px,
+      transparent 64px
+    ),
+    repeating-linear-gradient(
+      180deg,
+      rgba(109, 177, 255, 0.035),
+      rgba(109, 177, 255, 0.035) 1px,
+      transparent 1px,
+      transparent 64px
+    );
+}
+
+html[data-theme="dark"] .stat-card,
+html[data-theme="dark"] .spotlight-card,
+html[data-theme="dark"] .guide-block,
+html[data-theme="dark"] .pattern-card,
+html[data-theme="dark"] .modal-banner,
+html[data-theme="dark"] .fact-card,
+html[data-theme="dark"] .modal-story,
+html[data-theme="dark"] .reaction-card,
+html[data-theme="dark"] .reaction-mini,
+html[data-theme="dark"] .geo-map-shell {
+  border-color: rgba(166, 198, 230, 0.12);
+  background:
+    linear-gradient(180deg, rgba(17, 31, 46, 0.96), rgba(10, 20, 32, 0.92)),
+    radial-gradient(circle at top right, rgba(109, 177, 255, 0.12), transparent 48%);
+}
+
+html[data-theme="dark"] .stat-card {
+  background:
+    linear-gradient(180deg, rgba(15, 29, 44, 0.96), rgba(10, 22, 34, 0.9)),
+    radial-gradient(circle at top right, rgba(109, 177, 255, 0.12), transparent 46%);
+}
+
+html[data-theme="dark"] .field input,
+html[data-theme="dark"] .field select,
+html[data-theme="dark"] .ghost-button,
+html[data-theme="dark"] .spotlight-action,
+html[data-theme="dark"] .context-chip,
+html[data-theme="dark"] .spotlight-chip,
+html[data-theme="dark"] .legend-chip,
+html[data-theme="dark"] .modal-chip {
+  border-color: rgba(166, 198, 230, 0.14);
+  background: rgba(15, 29, 44, 0.9);
+  color: var(--text);
+}
+
+html[data-theme="dark"] .ghost-button:hover,
+html[data-theme="dark"] .spotlight-action:hover,
+html[data-theme="dark"] .context-chip:hover {
+  border-color: rgba(109, 177, 255, 0.34);
+  background: rgba(20, 38, 58, 0.96);
+}
+
+html[data-theme="dark"] .context-chip.is-selected {
+  border-color: rgba(109, 177, 255, 0.34);
+  background: rgba(109, 177, 255, 0.16);
+}
+
+html[data-theme="dark"] .field input::placeholder {
+  color: rgba(169, 190, 211, 0.72);
+}
+
+html[data-theme="dark"] .series-label {
+  border-color: rgba(166, 198, 230, 0.18);
+  background: rgba(109, 177, 255, 0.08);
+}
+
+html[data-theme="dark"] .element-card,
+html[data-theme="dark"] .mini-tile,
+html[data-theme="dark"] .modal-tile {
+  border-color: rgba(166, 198, 230, 0.14);
+  background:
+    radial-gradient(circle at top right, var(--tone-soft, rgba(109, 177, 255, 0.2)), transparent 56%),
+    linear-gradient(180deg, rgba(18, 33, 48, 0.98), rgba(10, 20, 32, 0.92));
+}
+
+html[data-theme="dark"] .element-card:hover {
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.34);
+}
+
+html[data-theme="dark"] .element-card.is-selected {
+  box-shadow:
+    0 0 0 3px rgba(109, 177, 255, 0.16),
+    0 18px 34px rgba(0, 0, 0, 0.36);
+}
+
+html[data-theme="dark"] .element-phase {
+  background: rgba(7, 18, 29, 0.82);
+  color: var(--accent-strong);
+}
+
+html[data-theme="dark"] .reaction-equation,
+html[data-theme="dark"] .reaction-mini code,
+html[data-theme="dark"] .pattern-inline-code,
+html[data-theme="dark"] .sources-panel code {
+  background: rgba(109, 177, 255, 0.14);
+  color: var(--accent-strong);
+}
+
+html[data-theme="dark"] .atom-visual {
+  border-color: rgba(166, 198, 230, 0.12);
+  background:
+    radial-gradient(circle at center, rgba(109, 177, 255, 0.12), transparent 58%),
+    linear-gradient(180deg, rgba(15, 29, 44, 0.96), rgba(9, 19, 30, 0.9));
+}
+
+html[data-theme="dark"] .modal-backdrop {
+  background: rgba(2, 8, 14, 0.74);
+}
+
+html[data-theme="dark"] .geo-ocean {
+  fill: rgba(8, 27, 43, 0.96);
+  stroke: rgba(166, 198, 230, 0.12);
+}
+
+html[data-theme="dark"] .geo-graticule path {
+  stroke: rgba(166, 198, 230, 0.12);
+}
+
+html[data-theme="dark"] .geo-land path {
+  fill: rgba(109, 177, 255, 0.34);
+}
+
+html[data-theme="dark"] .geo-badge rect {
+  fill: rgba(19, 38, 58, 0.96);
+  stroke: rgba(166, 198, 230, 0.16);
+}
+
+html[data-theme="dark"] .geo-badge text {
+  fill: var(--accent-strong);
+}
+
 @media (max-width: 1180px) {
   .hero,
   .app-grid {
@@ -869,6 +1126,10 @@ body.modal-open {
   }
 
   .pattern-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .geo-context-layout {
     grid-template-columns: 1fr;
   }
 }
